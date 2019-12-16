@@ -1,28 +1,25 @@
 {
   "schemaVersion": 1,
-  "id": "starter",
+  "id": "shulkercharm",
   "version": "${version}",
 
-  "name": "Fabric Starter",
-  "icon": "assets/starter/icon.png",
-  "description": "Template for starting out Fabric mods",
+  "name": "Shulker Charm",
+  "icon": "assets/shulkercharm/icon.png",
+  "description": "Local flight in survival",
   "license": "MIT",
   "contact": {
-    "sources": "https://github.com/CottonMC/FabricStarter"
+    "sources": "https://github.com/Boundarybreaker/ShulkerCharm"
   },
   "environment": "*",
   "entrypoints": {
     "main": [
-      "io.github.cottonmc.starter.FabricStarter"
+      "space.bbkr.shulkercharm.ShulkerCharm"
     ]
   },
   "mixins": [
-    "mixins.starter.json"
+    "mixins.shulkercharm.json"
   ],
   "depends": {
     "fabricloader": ">=0.4.0"
-  },
-  "custom": {
-    "modmenu:api": true
   }
 }

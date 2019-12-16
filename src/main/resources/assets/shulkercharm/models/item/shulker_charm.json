@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "texures": {
+    "layer0": "shulkercharm:item/shulker_charm"
+  }
+}
