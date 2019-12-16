@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "FEF",
+    " # "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:shulker_shell"
+    },
+    "F": {
+      "item": "minecraft:feather"
+    },
+    "E": {
+      "item": "minecraft:elytra"
+    }
+  },
+  "result": {
+    "item": "shulkercharm:shulker_charm",
+    "count": 1
+  }
+}

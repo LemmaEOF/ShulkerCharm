@@ -11,6 +11,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import space.bbkr.shulkercharm.hooks.CustomDurabilityItem;
 
@@ -23,18 +25,30 @@ public class ShulkerCharmItem extends Item implements ITrinket, CustomDurability
 	}
 
 	@Override
+	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+		return ITrinket.equipTrinket(user, hand);
+	}
+
+	@Override
 	public void tick(PlayerEntity player, ItemStack stack) {
-		CompoundTag tag = stack.getOrCreateTag();
-		if (!tag.contains("Energy", NbtType.INT)) tag.putInt("Energy", 0);
-		int energy = tag.getInt("Energy");
-		if (energy > 0) {
-			tag.putInt("Energy", energy - 1);
+		if (player.abilities.flying) {
+			CompoundTag tag = stack.getOrCreateTag();
+			if (!tag.contains("Energy", NbtType.INT)) tag.putInt("Energy", 0);
+			int energy = tag.getInt("Energy");
+			if (energy > 0) {
+				tag.putInt("Energy", energy - 1);
+			}
 		}
 	}
 
 	@Override
 	public boolean canWearInSlot(String group, String slot) {
 		return group.equals(SlotGroups.HEAD) && slot.equals(Slots.NECKLACE);
+	}
+
+	@Override
+	public int getMaxDurability(ItemStack stack) {
+		return ShulkerCharm.config.maxEnergy;
 	}
 
 	@Override
@@ -47,13 +61,8 @@ public class ShulkerCharmItem extends Item implements ITrinket, CustomDurability
 	}
 
 	@Override
-	public boolean showDurability(ItemStack stack) {
-		return true;
-	}
-
-	@Override
 	public int getDurabilityColor(ItemStack stack) {
-		return 0;
+		return 0xC7C38D;
 	}
 
 	@Override

@@ -38,13 +38,19 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity {
 			for (PlayerEntity player : players) {
 				TrinketComponent comp = TrinketsApi.TRINKETS.get(player);
 				ItemStack stack = comp.getStack(SlotGroups.HEAD, Slots.NECKLACE);
-				if (stack.getItem() == ShulkerCharm.SHULKER_CHARM) {
-					CompoundTag tag = stack.getOrCreateTag();
-					if (!tag.contains("Energy", NbtType.INT)) tag.putInt("Energy", 0);
-					int energy = tag.getInt("Energy");
-					tag.putInt("Energy", Math.min(energy + 2, ShulkerCharm.config.maxEnergy));
-				}
+				tryChargeStack(stack);
+				tryChargeStack(player.getMainHandStack());
+				tryChargeStack(player.getOffHandStack());
 			}
+		}
+	}
+
+	void tryChargeStack(ItemStack stack) {
+		if (stack.getItem() == ShulkerCharm.SHULKER_CHARM) {
+			CompoundTag tag = stack.getOrCreateTag();
+			if (!tag.contains("Energy", NbtType.INT)) tag.putInt("Energy", 0);
+			int energy = tag.getInt("Energy");
+			tag.putInt("Energy", Math.min(energy + 2, ShulkerCharm.config.maxEnergy));
 		}
 	}
 }

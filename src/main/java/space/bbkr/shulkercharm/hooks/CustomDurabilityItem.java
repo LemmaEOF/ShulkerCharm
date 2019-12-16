@@ -4,15 +4,9 @@ import net.minecraft.item.ItemStack;
 
 public interface CustomDurabilityItem {
 
-	default int getDurability(ItemStack stack) {
-		return 0;
-	}
+	int getMaxDurability(ItemStack stack);
 
-	default boolean showDurability(ItemStack stack) {
-		return false;
-	}
+	int getDurability(ItemStack stack);
 
-	default int getDurabilityColor(ItemStack stack) {
-		return 0;
-	}
+	int getDurabilityColor(ItemStack stack);
 }

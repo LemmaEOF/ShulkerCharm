@@ -14,6 +14,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Rarity;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,7 +27,7 @@ public class ShulkerCharm implements ModInitializer {
 
 	public static final Logger logger = LogManager.getLogger();
 
-	public static final Item SHULKER_CHARM = Registry.register(Registry.ITEM, new Identifier(MODID, "shulker_charm"), new ShulkerCharmItem(new Item.Settings().group(ItemGroup.TRANSPORTATION)));
+	public static final Item SHULKER_CHARM = Registry.register(Registry.ITEM, new Identifier(MODID, "shulker_charm"), new ShulkerCharmItem(new Item.Settings().maxCount(1).rarity(Rarity.RARE).group(ItemGroup.TRANSPORTATION)));
 
 	public static ShulkerCharmConfig config;
 

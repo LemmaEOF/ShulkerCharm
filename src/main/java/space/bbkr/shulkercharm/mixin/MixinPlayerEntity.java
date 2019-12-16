@@ -54,6 +54,10 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 				}
 			} else {
 				abilities.allowFlying = false;
+				if (abilities.flying) {
+					abilities.flying = false;
+					addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 100));
+				}
 			}
 			this.sendAbilitiesUpdate();
 		}
