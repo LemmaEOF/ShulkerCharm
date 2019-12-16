@@ -47,6 +47,14 @@ public class ShulkerCharmItem extends Item implements ITrinket, CustomDurability
 	}
 
 	@Override
+	public boolean shouldShowDurability(ItemStack stack) {
+		if (ShulkerCharm.config.rangeModifier == -1) return false;
+		CompoundTag tag = stack.getOrCreateTag();
+		if (tag.contains("Energy", NbtType.INT)) return tag.getInt("Energy") != getMaxDurability(stack);
+		else return true;
+	}
+
+	@Override
 	public int getMaxDurability(ItemStack stack) {
 		return ShulkerCharm.config.maxEnergy;
 	}

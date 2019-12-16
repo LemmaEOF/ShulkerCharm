@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import space.bbkr.shulkercharm.ShulkerCharm;
+import space.bbkr.shulkercharm.ShulkerCharmItem;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -46,11 +47,11 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity {
 	}
 
 	void tryChargeStack(ItemStack stack) {
-		if (stack.getItem() == ShulkerCharm.SHULKER_CHARM) {
+		if (stack.getItem() instanceof ShulkerCharmItem) {
 			CompoundTag tag = stack.getOrCreateTag();
 			if (!tag.contains("Energy", NbtType.INT)) tag.putInt("Energy", 0);
 			int energy = tag.getInt("Energy");
-			tag.putInt("Energy", Math.min(energy + 2, ShulkerCharm.config.maxEnergy));
+			tag.putInt("Energy", Math.min(energy + 2, ((ShulkerCharmItem)stack.getItem()).getMaxDurability(stack)));
 		}
 	}
 }
