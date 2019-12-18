@@ -1,6 +1,6 @@
 package space.bbkr.shulkercharm.mixin;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
@@ -22,13 +22,13 @@ public abstract class MixinItemRenderer {
 	private void renderCustomDurabilityBar(TextRenderer textRenderer, ItemStack stack, int x, int y, String amount, CallbackInfo info) {
 		if (stack.getItem() instanceof CustomDurabilityItem) {
 			CustomDurabilityItem durab = (CustomDurabilityItem)stack.getItem();
-			RenderSystem.disableDepthTest();
-			RenderSystem.disableTexture();
-			RenderSystem.disableAlphaTest();
-			RenderSystem.disableBlend();
+			GlStateManager.disableDepthTest();
+			GlStateManager.disableTexture();
+			GlStateManager.disableAlphaTest();
+			GlStateManager.disableBlend();
 
 			Tessellator tessellator = Tessellator.getInstance();
-			BufferBuilder builder = tessellator.getBuffer();
+			BufferBuilder builder = tessellator.getBufferBuilder();
 
 			float progress = ((float) durab.getDurability(stack)) / ((float) durab.getMaxDurability(stack));
 			int durability = (int) (13 * progress);
@@ -37,10 +37,10 @@ public abstract class MixinItemRenderer {
 			this.renderGuiQuad(builder, x + 2, y + 13, 13, 2, 0, 0, 0, 255);
 			this.renderGuiQuad(builder, x + 2, y + 13, durability, 1, color >> 16 & 255, color >> 8 & 255, color & 255, 255);
 
-			RenderSystem.enableBlend();
-			RenderSystem.enableAlphaTest();
-			RenderSystem.enableTexture();
-			RenderSystem.enableDepthTest();
+			GlStateManager.enableBlend();
+			GlStateManager.enableAlphaTest();
+			GlStateManager.enableTexture();
+			GlStateManager.enableDepthTest();
 		}
 	}
 }

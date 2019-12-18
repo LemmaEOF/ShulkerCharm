@@ -22,7 +22,7 @@
   "depends": {
     "fabricloader": ">=0.4.0",
     "fabric": "*",
-    "jankson": ">=2.0.0",
-    "trinkets": ">=2.3.0"
+    "jankson": ">=1.0.0",
+    "trinkets": ">=2.1.0"
   }
 }

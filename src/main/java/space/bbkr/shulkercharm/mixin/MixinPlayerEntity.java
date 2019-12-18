@@ -38,12 +38,12 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 			if (stack.getItem() == ShulkerCharm.SHULKER_CHARM) {
 				if (ShulkerCharm.config.rangeModifier != -1) {
 					CompoundTag tag = stack.getOrCreateTag();
-					if (tag.contains("Energy")) {
+					if (tag.containsKey("Energy")) {
 						int energy = tag.getInt("Energy");
 						abilities.allowFlying = energy > 0;
 						if (!abilities.allowFlying) abilities.flying = false;
 						if (energy == 1) {
-							addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 200));
+							addPotionEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 200));
 						}
 					} else {
 						tag.putInt("Energy", 0);
@@ -56,7 +56,7 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 				abilities.allowFlying = false;
 				if (abilities.flying) {
 					abilities.flying = false;
-					addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 100));
+					addPotionEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 100));
 				}
 			}
 			this.sendAbilitiesUpdate();

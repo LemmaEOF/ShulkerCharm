@@ -33,7 +33,7 @@ public class ShulkerCharmItem extends Item implements ITrinket, CustomDurability
 	public void tick(PlayerEntity player, ItemStack stack) {
 		if (player.abilities.flying) {
 			CompoundTag tag = stack.getOrCreateTag();
-			if (!tag.contains("Energy", NbtType.INT)) tag.putInt("Energy", 0);
+			if (!tag.containsKey("Energy", NbtType.INT)) tag.putInt("Energy", 0);
 			int energy = tag.getInt("Energy");
 			if (energy > 0) {
 				tag.putInt("Energy", energy - 1);
@@ -50,7 +50,7 @@ public class ShulkerCharmItem extends Item implements ITrinket, CustomDurability
 	public boolean shouldShowDurability(ItemStack stack) {
 		if (ShulkerCharm.config.rangeModifier == -1) return false;
 		CompoundTag tag = stack.getOrCreateTag();
-		if (tag.contains("Energy", NbtType.INT)) return tag.getInt("Energy") != getMaxDurability(stack);
+		if (tag.containsKey("Energy", NbtType.INT)) return tag.getInt("Energy") != getMaxDurability(stack);
 		else return true;
 	}
 
@@ -62,7 +62,7 @@ public class ShulkerCharmItem extends Item implements ITrinket, CustomDurability
 	@Override
 	public int getDurability(ItemStack stack) {
 		CompoundTag tag = stack.getOrCreateTag();
-		if (tag.contains("Energy", NbtType.INT)) {
+		if (tag.containsKey("Energy", NbtType.INT)) {
 			return tag.getInt("Energy");
 		}
 		return 0;
@@ -77,7 +77,7 @@ public class ShulkerCharmItem extends Item implements ITrinket, CustomDurability
 	public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
 		if (context.isAdvanced()) {
 			CompoundTag tag = stack.getOrCreateTag();
-			if (!tag.contains("Energy", NbtType.INT)) tag.putInt("Energy", 0);
+			if (!tag.containsKey("Energy", NbtType.INT)) tag.putInt("Energy", 0);
 			int energy = tag.getInt("Energy");
 			tooltip.add(new TranslatableText("tooltip.shulkercharm.energy", energy, ShulkerCharm.config.maxEnergy));
 		}

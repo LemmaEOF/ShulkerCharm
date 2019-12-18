@@ -35,7 +35,7 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity {
 		if (!world.isClient && this.level > 0) {
 			double range = this.level * ShulkerCharm.config.rangeModifier + 10;
 			Box box = new Box(this.pos).expand(range).stretch(0, world.getHeight(), 0);
-			List<PlayerEntity> players = world.getNonSpectatingEntities(PlayerEntity.class, box);
+			List<PlayerEntity> players = world.getEntities(PlayerEntity.class, box, player -> !player.isSpectator());
 			for (PlayerEntity player : players) {
 				TrinketComponent comp = TrinketsApi.TRINKETS.get(player);
 				ItemStack stack = comp.getStack(SlotGroups.HEAD, Slots.NECKLACE);
@@ -49,7 +49,7 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity {
 	void tryChargeStack(ItemStack stack) {
 		if (stack.getItem() instanceof ShulkerCharmItem) {
 			CompoundTag tag = stack.getOrCreateTag();
-			if (!tag.contains("Energy", NbtType.INT)) tag.putInt("Energy", 0);
+			if (!tag.containsKey("Energy", NbtType.INT)) tag.putInt("Energy", 0);
 			int energy = tag.getInt("Energy");
 			tag.putInt("Energy", Math.min(energy + 2, ((ShulkerCharmItem)stack.getItem()).getMaxDurability(stack)));
 		}

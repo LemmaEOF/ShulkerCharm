@@ -45,15 +45,15 @@ repositories {
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.yarn_build}:v2"
+	mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.yarn_build}"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	compileOnly "com.google.code.findbugs:jsr305:3.0.2"
 
 	modImplementation "com.github.emilyploszaj:trinkets:${project.trinkets_version}"
-	modImplementation "io.github.cottonmc:Jankson-Fabric:${project.jankson_version}"
+	modImplementation "io.github.cottonmc:Jankson:${project.jankson_version}"
 	include "com.github.emilyploszaj:trinkets:${project.trinkets_version}"
-	include "io.github.cottonmc:Jankson-Fabric:${project.jankson_version}"
+	include "io.github.cottonmc:Jankson:${project.jankson_version}"
 }
 
 processResources {
