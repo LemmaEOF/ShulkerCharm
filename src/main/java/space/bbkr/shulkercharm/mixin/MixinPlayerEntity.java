@@ -31,8 +31,8 @@ public abstract class MixinPlayerEntity extends LivingEntity {
 	@Inject(method = "tickMovement", at = @At("HEAD"))
 	private void injectFlight(CallbackInfo info) {
 		//TODO: make an event somewhere so this doesn't collide with anyone else's creative-flight mods
-		if (((PlayerEntity)(Object)this).isCreative()) abilities.allowFlying = true;
-		if (!this.world.isClient && !((PlayerEntity)(Object)this).isCreative()) {
+		if (((PlayerEntity)(Object)this).isCreative() || ((PlayerEntity)(Object)this).isSpectator()) abilities.allowFlying = true;
+		if (!this.world.isClient && !((PlayerEntity)(Object)this).isCreative() && !((PlayerEntity)(Object)this).isSpectator()) {
 			TrinketComponent comp = TrinketsApi.TRINKETS.get(this);
 			ItemStack stack = comp.getStack(SlotGroups.HEAD, Slots.NECKLACE);
 			if (stack.getItem() == ShulkerCharm.SHULKER_CHARM) {
