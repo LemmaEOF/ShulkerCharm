@@ -66,7 +66,7 @@ public class ShulkerCharmItem extends Item implements ITrinket, CustomDurability
 
 	@Override
 	public boolean canWearInSlot(String group, String slot) {
-		return group.equals(SlotGroups.HEAD) && slot.equals(Slots.NECKLACE);
+		return group.equals(SlotGroups.CHEST) && slot.equals(Slots.NECKLACE);
 	}
 
 	@Override

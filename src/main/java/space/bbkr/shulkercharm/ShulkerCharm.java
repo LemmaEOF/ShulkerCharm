@@ -45,7 +45,7 @@ public class ShulkerCharm implements ModInitializer {
 			config.maxEnergy = -1;
 			saveConfig(config);
 		}
-		TrinketSlots.addSlot(SlotGroups.HEAD, Slots.NECKLACE, new Identifier("trinkets", "textures/item/empty_trinket_slot_necklace.png"));
+		TrinketSlots.addSlot(SlotGroups.CHEST, Slots.NECKLACE, new Identifier("trinkets", "textures/item/empty_trinket_slot_necklace.png"));
 	}
 
 	public ShulkerCharmConfig loadConfig() {
