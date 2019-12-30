@@ -52,8 +52,10 @@ dependencies {
 
 	modImplementation "com.github.emilyploszaj:trinkets:${project.trinkets_version}"
 	modImplementation "io.github.cottonmc:Jankson-Fabric:${project.jankson_version}"
+	modImplementation "io.github.ladysnake:PlayerAbilityLib:${project.pal_version}"
 	include "com.github.emilyploszaj:trinkets:${project.trinkets_version}"
 	include "io.github.cottonmc:Jankson-Fabric:${project.jankson_version}"
+	include "io.github.ladysnake:PlayerAbilityLib:${project.pal_version}"
 }
 
 processResources {

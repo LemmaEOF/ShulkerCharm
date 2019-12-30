@@ -3,8 +3,11 @@ package space.bbkr.shulkercharm;
 import dev.emi.trinkets.api.ITrinket;
 import dev.emi.trinkets.api.SlotGroups;
 import dev.emi.trinkets.api.Slots;
+import io.github.ladysnake.pal.VanillaAbilities;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -31,12 +34,32 @@ public class ShulkerCharmItem extends Item implements ITrinket, CustomDurability
 
 	@Override
 	public void tick(PlayerEntity player, ItemStack stack) {
-		if (player.abilities.flying) {
-			CompoundTag tag = stack.getOrCreateTag();
-			if (!tag.contains("Energy", NbtType.INT)) tag.putInt("Energy", 0);
-			int energy = tag.getInt("Energy");
-			if (energy > 0) {
-				tag.putInt("Energy", energy - 1);
+		int power = getPower(stack);
+		if (ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
+			if (power == 0) {
+				ShulkerCharm.CHARM_FLIGHT.revokeFrom(player, VanillaAbilities.ALLOW_FLYING);
+				if (!VanillaAbilities.ALLOW_FLYING.isEnabledFor(player)) {
+					player.abilities.flying = false;
+					player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 200));
+				}
+			}
+		} else {
+			if (power > 0) {
+				ShulkerCharm.CHARM_FLIGHT.grantTo(player, VanillaAbilities.ALLOW_FLYING);
+			}
+		}
+		if (VanillaAbilities.FLYING.isEnabledFor(player)) {
+			setPower(stack, power - 1);
+		}
+	}
+
+	@Override
+	public void onUnequip(PlayerEntity player, ItemStack stack) {
+		if (ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
+			ShulkerCharm.CHARM_FLIGHT.revokeFrom(player, VanillaAbilities.ALLOW_FLYING);
+			if (!VanillaAbilities.ALLOW_FLYING.isEnabledFor(player)) {
+				player.abilities.flying = false;
+				player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 100));
 			}
 		}
 	}
@@ -50,22 +73,18 @@ public class ShulkerCharmItem extends Item implements ITrinket, CustomDurability
 	public boolean shouldShowDurability(ItemStack stack) {
 		if (ShulkerCharm.config.rangeModifier == -1) return false;
 		CompoundTag tag = stack.getOrCreateTag();
-		if (tag.contains("Energy", NbtType.INT)) return tag.getInt("Energy") != getMaxDurability(stack);
+		if (tag.contains("Power", NbtType.INT)) return tag.getInt("Power") != getMaxDurability(stack);
 		else return true;
 	}
 
 	@Override
 	public int getMaxDurability(ItemStack stack) {
-		return ShulkerCharm.config.maxEnergy;
+		return ShulkerCharm.config.maxPower;
 	}
 
 	@Override
 	public int getDurability(ItemStack stack) {
-		CompoundTag tag = stack.getOrCreateTag();
-		if (tag.contains("Energy", NbtType.INT)) {
-			return tag.getInt("Energy");
-		}
-		return 0;
+		return getPower(stack);
 	}
 
 	@Override
@@ -76,10 +95,42 @@ public class ShulkerCharmItem extends Item implements ITrinket, CustomDurability
 	@Override
 	public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
 		if (context.isAdvanced()) {
-			CompoundTag tag = stack.getOrCreateTag();
-			if (!tag.contains("Energy", NbtType.INT)) tag.putInt("Energy", 0);
-			int energy = tag.getInt("Energy");
-			tooltip.add(new TranslatableText("tooltip.shulkercharm.energy", energy, ShulkerCharm.config.maxEnergy));
+			int power = getPower(stack);
+			tooltip.add(new TranslatableText("tooltip.shulkercharm.power", power, ShulkerCharm.config.maxPower));
 		}
+	}
+
+	/**
+	 * Get the power of a shulker charm.
+	 * @param stack The stack to get for.
+	 * @return The amount of power it currently has.
+	 */
+	public int getPower(ItemStack stack) {
+		CompoundTag tag = stack.getOrCreateTag();
+		if (tag.contains("Energy", NbtType.INT)) {
+			tag.putInt("Power", tag.getInt("Energy"));
+			tag.remove("Energy");
+		}
+		if (!tag.contains("Power", NbtType.INT)) tag.putInt("Power", 0);
+		return tag.getInt("Power");
+	}
+
+	/**
+	 * Set the power of a shulker charm.
+	 * @param stack The stack to set for.
+	 * @param power The amount of power it should have.
+	 */
+	public void setPower(ItemStack stack, int power) {
+		CompoundTag tag = stack.getOrCreateTag();
+		tag.putInt("Power", Math.min(power, getMaxDurability(stack)));
+	}
+
+	/**
+	 * Charge a shulker charm from a beacon. Adds 2 energy, typically.
+	 * @param stack The stack to charge.
+	 */
+	public void charge(ItemStack stack) {
+		int power = getPower(stack);
+		setPower(stack, power + 2);
 	}
 }
