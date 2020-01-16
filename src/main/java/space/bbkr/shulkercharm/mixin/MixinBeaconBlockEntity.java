@@ -38,7 +38,7 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity {
 			List<PlayerEntity> players = world.getNonSpectatingEntities(PlayerEntity.class, box);
 			for (PlayerEntity player : players) {
 				TrinketComponent comp = TrinketsApi.TRINKETS.get(player);
-				ItemStack stack = comp.getStack(SlotGroups.HEAD, Slots.NECKLACE);
+				ItemStack stack = comp.getStack(SlotGroups.CHEST, Slots.NECKLACE);
 				tryChargeStack(stack);
 				tryChargeStack(player.getMainHandStack());
 				tryChargeStack(player.getOffHandStack());
