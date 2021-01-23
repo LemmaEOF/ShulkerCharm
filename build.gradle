@@ -1,25 +1,8 @@
-buildscript {
-	repositories {
-		jcenter()
-		maven {
-			name = 'Fabric'
-			url = 'http://maven.modmuss50.me/'
-		}
-	}
-	dependencies {
-		classpath "net.fabricmc:fabric-loom:0.2.6-SNAPSHOT"
-	}
-}
-
 plugins {
-	id 'java'
-	id 'eclipse'
-	id 'idea'
-	id 'maven-publish'
-	id "com.jfrog.artifactory" version "4.9.0"
+	id "fabric-loom" version "0.5-SNAPSHOT"
+	id "maven-publish"
+	id "com.jfrog.artifactory" version "4.15.2"
 }
-
-apply plugin: net.fabricmc.loom.LoomGradlePlugin
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -37,10 +20,11 @@ minecraft {
 
 repositories {
 	mavenCentral()
+	maven { url "https://dl.bintray.com/ladysnake/libs" }
 	maven { url "http://maven.fabricmc.net/" }
-	maven { url "http://server.bbkr.space:8081/artifactory/libs-release" }
+	maven { url "https://server.bbkr.space/artifactory/libs-release" }
 	maven { url "https://jitpack.io" }
-	maven { url "https://maven.pkg.github.com" }
+//	maven { url "https://maven.pkg.github.com" }
 }
 
 dependencies {
@@ -121,7 +105,7 @@ publishing {
 
 artifactory {
 	if (project.hasProperty("artifactoryUsername")) {
-		contextUrl = "http://server.bbkr.space:8081/artifactory/"
+		contextUrl = "https://server.bbkr.space/artifactory/"
 		publish {
 			repository {
 				if (version.contains("SNAPSHOT")) {

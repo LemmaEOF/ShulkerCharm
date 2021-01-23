@@ -1,8 +1,9 @@
 package space.bbkr.shulkercharm;
 
-import dev.emi.trinkets.api.ITrinket;
 import dev.emi.trinkets.api.SlotGroups;
 import dev.emi.trinkets.api.Slots;
+import dev.emi.trinkets.api.TrinketInventory;
+import dev.emi.trinkets.api.TrinketItem;
 import io.github.ladysnake.pal.VanillaAbilities;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.client.item.TooltipContext;
@@ -22,19 +23,15 @@ import space.bbkr.shulkercharm.hooks.CustomDurabilityItem;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ShulkerCharmItem extends Item implements ITrinket, CustomDurabilityItem {
+public class ShulkerCharmItem extends TrinketItem implements CustomDurabilityItem {
 	public ShulkerCharmItem(Settings settings) {
 		super(settings);
 	}
 
 	@Override
-	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-		return ITrinket.equipTrinket(user, hand);
-	}
-
-	@Override
 	public void tick(PlayerEntity player, ItemStack stack) {
 		int power = getPower(stack);
+		if (player.world.isClient) return;
 		if (ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
 			if (power == 0) {
 				ShulkerCharm.CHARM_FLIGHT.revokeFrom(player, VanillaAbilities.ALLOW_FLYING);
@@ -48,14 +45,14 @@ public class ShulkerCharmItem extends Item implements ITrinket, CustomDurability
 				ShulkerCharm.CHARM_FLIGHT.grantTo(player, VanillaAbilities.ALLOW_FLYING);
 			}
 		}
-		if (VanillaAbilities.FLYING.isEnabledFor(player)) {
+		if (VanillaAbilities.FLYING.isEnabledFor(player) && ShulkerCharm.config.rangeModifier != -1) {
 			setPower(stack, power - 1);
 		}
 	}
 
 	@Override
 	public void onUnequip(PlayerEntity player, ItemStack stack) {
-		if (ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
+		if (!player.world.isClient && ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
 			ShulkerCharm.CHARM_FLIGHT.revokeFrom(player, VanillaAbilities.ALLOW_FLYING);
 			if (!VanillaAbilities.ALLOW_FLYING.isEnabledFor(player)) {
 				player.abilities.flying = false;
@@ -106,6 +103,7 @@ public class ShulkerCharmItem extends Item implements ITrinket, CustomDurability
 	 * @return The amount of power it currently has.
 	 */
 	public int getPower(ItemStack stack) {
+		if (ShulkerCharm.config.rangeModifier == -1) return ShulkerCharm.config.maxPower;
 		CompoundTag tag = stack.getOrCreateTag();
 		if (tag.contains("Energy", NbtType.INT)) {
 			tag.putInt("Power", tag.getInt("Energy"));

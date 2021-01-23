@@ -58,7 +58,7 @@ public class ShulkerCharm implements ModInitializer {
 			JsonElement jsonElementNew = jankson.toJson(new ShulkerCharmConfig());
 			if(jsonElementNew instanceof JsonObject){
 				JsonObject jsonNew = (JsonObject) jsonElementNew;
-				if(json.getDelta(jsonNew).size()>= 0){
+				if(json.getDelta(jsonNew).size() > 0){
 					saveConfig(result);
 				}
 			}
