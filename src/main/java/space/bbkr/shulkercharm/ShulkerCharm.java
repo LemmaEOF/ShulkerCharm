@@ -51,7 +51,7 @@ public class ShulkerCharm implements ModInitializer {
 	public ShulkerCharmConfig loadConfig() {
 		try {
 			Jankson jankson = JanksonFactory.createJankson();
-			File file = FabricLoader.getInstance().getConfigDirectory().toPath().resolve("shulkercharm.json5").toFile();
+			File file = FabricLoader.getInstance().getConfigDir().resolve("shulkercharm.json5").toFile();
 			if (!file.exists()) saveConfig(new ShulkerCharmConfig());
 			JsonObject json = jankson.load(file);
 			ShulkerCharmConfig result =  jankson.fromJson(json, ShulkerCharmConfig.class);
