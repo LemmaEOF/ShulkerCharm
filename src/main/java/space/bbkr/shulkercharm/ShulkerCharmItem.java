@@ -2,7 +2,6 @@ package space.bbkr.shulkercharm;
 
 import dev.emi.trinkets.api.SlotGroups;
 import dev.emi.trinkets.api.Slots;
-import dev.emi.trinkets.api.TrinketInventory;
 import dev.emi.trinkets.api.TrinketItem;
 import io.github.ladysnake.pal.VanillaAbilities;
 import net.fabricmc.fabric.api.util.NbtType;
@@ -10,13 +9,10 @@ import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import space.bbkr.shulkercharm.hooks.CustomDurabilityItem;
 
@@ -33,7 +29,7 @@ public class ShulkerCharmItem extends TrinketItem implements CustomDurabilityIte
 		int power = getPower(stack);
 		if (player.world.isClient) return;
 		if (ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
-			if (power == 0) {
+			if (power <= 0) {
 				ShulkerCharm.CHARM_FLIGHT.revokeFrom(player, VanillaAbilities.ALLOW_FLYING);
 				if (!VanillaAbilities.ALLOW_FLYING.isEnabledFor(player)) {
 					player.abilities.flying = false;
@@ -105,10 +101,6 @@ public class ShulkerCharmItem extends TrinketItem implements CustomDurabilityIte
 	public int getPower(ItemStack stack) {
 		if (ShulkerCharm.config.rangeModifier == -1) return ShulkerCharm.config.maxPower;
 		CompoundTag tag = stack.getOrCreateTag();
-		if (tag.contains("Energy", NbtType.INT)) {
-			tag.putInt("Power", tag.getInt("Energy"));
-			tag.remove("Energy");
-		}
 		if (!tag.contains("Power", NbtType.INT)) tag.putInt("Power", 0);
 		return tag.getInt("Power");
 	}
@@ -120,7 +112,7 @@ public class ShulkerCharmItem extends TrinketItem implements CustomDurabilityIte
 	 */
 	public void setPower(ItemStack stack, int power) {
 		CompoundTag tag = stack.getOrCreateTag();
-		tag.putInt("Power", Math.min(power, getMaxDurability(stack)));
+		tag.putInt("Power", Math.max(0, Math.min(power, getMaxDurability(stack))));
 	}
 
 	/**
