@@ -1,8 +1,11 @@
 package space.bbkr.shulkercharm;
 
-import blue.endless.jankson.Comment;
+import me.shedaniel.autoconfig.ConfigData;
+import me.shedaniel.autoconfig.annotation.Config;
+import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 
-public class ShulkerCharmConfig {
+@Config(name="shulkercharm")
+public class ShulkerCharmConfig implements ConfigData {
 	@Comment("The modifier for the maximum distance from a beacon to keep charging.\n"
 			+ "Formula is <beacon level> * <modifier> + 10.\n"
 			+ "Vanilla range modifier is 10; set to -1 to disable charge requirement.")

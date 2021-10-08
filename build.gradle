@@ -1,53 +1,46 @@
 plugins {
-	id "fabric-loom" version "0.5-SNAPSHOT"
-	id "maven-publish"
-	id "com.jfrog.artifactory" version "4.15.2"
+	id 'fabric-loom' version '0.9-SNAPSHOT'
+	id 'maven-publish'
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
 
-if(rootProject.file('private.gradle').exists()) { //Publishing details
-	apply from: 'private.gradle'
-}
-
-archivesBaseName = "${project.archives_base_name}"
-group = "${project.maven_group}"
-version = "${project.mod_version}+${project.minecraft_version}"
-
-minecraft {
-}
-
-repositories {
-	mavenCentral()
-	maven { url "https://dl.bintray.com/ladysnake/libs" }
-	maven { url "http://maven.fabricmc.net/" }
-	maven { url "https://server.bbkr.space/artifactory/libs-release" }
-	maven { url "https://jitpack.io" }
-//	maven { url "https://maven.pkg.github.com" }
-}
+archivesBaseName = project.archives_base_name
+version = project.mod_version
+group = project.maven_group
 
 dependencies {
+	//to change the versions see the gradle.properties file
+	//minecraft version
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.yarn_build}:v2"
+	//yarn mappings
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	//fabric loader
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	//fabric api
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	compileOnly "com.google.code.findbugs:jsr305:3.0.2"
-
-	modImplementation "com.github.emilyploszaj:trinkets:${project.trinkets_version}"
-	modImplementation "io.github.cottonmc:Jankson-Fabric:${project.jankson_version}"
+	//trinkets, to equip trinkets
+	modImplementation "dev.emi:trinkets:${trinkets_version}"
+	//cardinal components api bcus trinkets???
+	modImplementation "dev.whomst:cardinal-components-base:${cardinal_components_version}"
+	modImplementation "dev.whomst:cardinal-components-entity:${cardinal_components_version}"
+	//player ability lib
 	modImplementation "io.github.ladysnake:PlayerAbilityLib:${project.pal_version}"
-	include "com.github.emilyploszaj:trinkets:${project.trinkets_version}"
-	include "io.github.ladysnake:PlayerAbilityLib:${project.pal_version}"
-	include "io.github.cottonmc:Jankson-Fabric:${project.jankson_version}"
+	//config api
+	modApi("me.shedaniel.cloth:cloth-config:${cloth_config_version}-fabric") {
+		exclude(group: "net.fabricmc.fabric-api")
+	}
 }
 
 processResources {
 	inputs.property "version", project.version
+
 	from(sourceSets.main.resources.srcDirs) {
 		include "fabric.mod.json"
-		expand version: project.version
+		expand "version": project.version
 	}
+
 	from(sourceSets.main.resources.srcDirs) {
 		exclude "fabric.mod.json"
 	}
@@ -58,6 +51,13 @@ processResources {
 // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType(JavaCompile) {
 	options.encoding = "UTF-8"
+}
+
+//fixes problem i had with intellij and gradle
+tasks {
+	processResources {
+		setDuplicatesStrategy('include')
+	}
 }
 
 // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
@@ -72,24 +72,28 @@ jar {
 	from "LICENSE"
 }
 
+repositories {
+	mavenCentral()
+	//reach entity attributes
+	maven {	url "https://maven.jamieswhiteshirt.com/libs-release"}
+	//mod menu
+	//maven {	url = "https://maven.terraformersmc.com/"}
+	//trinkets cardinal components
+	maven {
+		name = "LadysnakeLibs"
+		url = "https://ladysnake.jfrog.io/artifactory/mods"
+	}
+	maven { url "https://maven.shedaniel.me/" }
+}
+
 // configure the maven publication
 publishing {
 	publications {
-		maven(MavenPublication) {
+		mavenJava(MavenPublication) {
 			// add all the jars that should be included when publishing to maven
-			//artifact(jar) {
-			//	builtBy remapJar
-			//}
-			artifact ("${project.buildDir.absolutePath}/libs/${archivesBaseName}-${project.version}.jar") { //release jar - file location not provided anywhere in loom
-				classifier null
+			artifact(remapJar) {
 				builtBy remapJar
 			}
-
-			artifact ("${project.buildDir.absolutePath}/libs/${archivesBaseName}-${project.version}-dev.jar") { //release jar - file location not provided anywhere in loom
-				classifier "dev"
-				builtBy remapJar
-			}
-
 			artifact(sourcesJar) {
 				builtBy remapSourcesJar
 			}
@@ -97,34 +101,4 @@ publishing {
 	}
 
 	// select the repositories you want to publish to
-	repositories {
-		// uncomment to publish to the local maven
-		// mavenLocal()
-	}
-}
-
-artifactory {
-	if (project.hasProperty("artifactoryUsername")) {
-		contextUrl = "https://server.bbkr.space/artifactory/"
-		publish {
-			repository {
-				if (version.contains("SNAPSHOT")) {
-					repoKey = "libs-snapshot"
-				} else {
-					repoKey = "libs-release"
-				}
-
-				username = artifactoryUsername
-				password = artifactoryPassword
-			}
-			defaults {
-				publications("maven")
-
-				publishArtifacts = true
-				publishPom = true
-			}
-		}
-	} else {
-		println "Cannot configure artifactory; please define ext.artifactoryUsername and ext.artifactoryPassword before running artifactoryPublish"
-	}
 }

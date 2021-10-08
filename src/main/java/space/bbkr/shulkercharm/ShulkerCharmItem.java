@@ -1,22 +1,23 @@
 package space.bbkr.shulkercharm;
 
-import dev.emi.trinkets.api.SlotGroups;
-import dev.emi.trinkets.api.Slots;
+import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.TrinketItem;
 import io.github.ladysnake.pal.VanillaAbilities;
+import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.annotation.Nullable;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.world.World;
 import space.bbkr.shulkercharm.hooks.CustomDurabilityItem;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class ShulkerCharmItem extends TrinketItem implements CustomDurabilityItem {
@@ -25,49 +26,56 @@ public class ShulkerCharmItem extends TrinketItem implements CustomDurabilityIte
 	}
 
 	@Override
-	public void tick(PlayerEntity player, ItemStack stack) {
-		int power = getPower(stack);
-		if (player.world.isClient) return;
-		if (ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
-			if (power <= 0) {
-				ShulkerCharm.CHARM_FLIGHT.revokeFrom(player, VanillaAbilities.ALLOW_FLYING);
-				if (!VanillaAbilities.ALLOW_FLYING.isEnabledFor(player)) {
-					player.abilities.flying = false;
-					player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 200));
+	public void tick(ItemStack stack, SlotReference slot, LivingEntity entity) {
+		if(entity.isPlayer()) {
+			PlayerEntity player = (PlayerEntity) entity;
+			int power = getPower(stack);
+			if (player.world.isClient) return;
+			if (ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
+				if (power <= 0) {
+					ShulkerCharm.CHARM_FLIGHT.revokeFrom(player, VanillaAbilities.ALLOW_FLYING);
+					if (!VanillaAbilities.ALLOW_FLYING.isEnabledFor(player)) {
+						player.getAbilities().flying = false;
+						player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 200));
+					}
+				}
+			} else {
+				if (power > 0) {
+					ShulkerCharm.CHARM_FLIGHT.grantTo(player, VanillaAbilities.ALLOW_FLYING);
 				}
 			}
-		} else {
-			if (power > 0) {
-				ShulkerCharm.CHARM_FLIGHT.grantTo(player, VanillaAbilities.ALLOW_FLYING);
-			}
-		}
-		if (VanillaAbilities.FLYING.isEnabledFor(player) && ShulkerCharm.config.rangeModifier != -1) {
-			setPower(stack, power - 1);
-		}
-	}
-
-	@Override
-	public void onUnequip(PlayerEntity player, ItemStack stack) {
-		if (!player.world.isClient && ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
-			ShulkerCharm.CHARM_FLIGHT.revokeFrom(player, VanillaAbilities.ALLOW_FLYING);
-			if (!VanillaAbilities.ALLOW_FLYING.isEnabledFor(player)) {
-				player.abilities.flying = false;
-				player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 100));
+			if (VanillaAbilities.FLYING.isEnabledFor(player) && ShulkerCharm.config.rangeModifier != -1) {
+				setPower(stack, power - 1);
 			}
 		}
 	}
 
 	@Override
-	public boolean canWearInSlot(String group, String slot) {
-		return group.equals(SlotGroups.CHEST) && slot.equals(Slots.NECKLACE);
+	public void onUnequip(ItemStack stack, SlotReference slot, LivingEntity entity) {
+		if(entity.isPlayer()) {
+			PlayerEntity player = (PlayerEntity) entity;
+			if (!player.world.isClient && ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
+				ShulkerCharm.CHARM_FLIGHT.revokeFrom(player, VanillaAbilities.ALLOW_FLYING);
+				if (!VanillaAbilities.ALLOW_FLYING.isEnabledFor(player)) {
+					player.getAbilities().flying = false;
+					player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 100));
+				}
+			}
+		}
 	}
 
 	@Override
 	public boolean shouldShowDurability(ItemStack stack) {
-		if (ShulkerCharm.config.rangeModifier == -1) return false;
-		CompoundTag tag = stack.getOrCreateTag();
-		if (tag.contains("Power", NbtType.INT)) return tag.getInt("Power") != getMaxDurability(stack);
-		else return true;
+		if (ShulkerCharm.config.rangeModifier == -1) {
+			return false;
+		}
+		NbtCompound tag = stack.getOrCreateNbt();
+		if (tag.contains("Power", NbtType.INT)) {
+			return tag.getInt("Power") != getMaxDurability(stack);
+		}
+		else {
+			return true;
+		}
 	}
 
 	@Override
@@ -100,7 +108,7 @@ public class ShulkerCharmItem extends TrinketItem implements CustomDurabilityIte
 	 */
 	public int getPower(ItemStack stack) {
 		if (ShulkerCharm.config.rangeModifier == -1) return ShulkerCharm.config.maxPower;
-		CompoundTag tag = stack.getOrCreateTag();
+		NbtCompound tag = stack.getOrCreateNbt();
 		if (!tag.contains("Power", NbtType.INT)) tag.putInt("Power", 0);
 		return tag.getInt("Power");
 	}
@@ -111,7 +119,7 @@ public class ShulkerCharmItem extends TrinketItem implements CustomDurabilityIte
 	 * @param power The amount of power it should have.
 	 */
 	public void setPower(ItemStack stack, int power) {
-		CompoundTag tag = stack.getOrCreateTag();
+		NbtCompound tag = stack.getOrCreateNbt();
 		tag.putInt("Power", Math.max(0, Math.min(power, getMaxDurability(stack))));
 	}
 
@@ -122,5 +130,6 @@ public class ShulkerCharmItem extends TrinketItem implements CustomDurabilityIte
 	public void charge(ItemStack stack) {
 		int power = getPower(stack);
 		setPower(stack, power + 2);
+		//System.out.println("Power: " + power);
 	}
 }

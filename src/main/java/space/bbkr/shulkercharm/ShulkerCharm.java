@@ -1,16 +1,11 @@
 package space.bbkr.shulkercharm;
 
-import blue.endless.jankson.Jankson;
-import blue.endless.jankson.JsonElement;
-import blue.endless.jankson.JsonObject;
-import dev.emi.trinkets.TrinketsMixinPlugin;
-import dev.emi.trinkets.api.SlotGroups;
-import dev.emi.trinkets.api.Slots;
-import dev.emi.trinkets.api.TrinketSlots;
+import dev.emi.trinkets.TrinketSlot;
 import dev.emi.trinkets.api.TrinketsApi;
-import io.github.cottonmc.jankson.JanksonFactory;
 import io.github.ladysnake.pal.AbilitySource;
 import io.github.ladysnake.pal.Pal;
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.Item;
@@ -39,48 +34,13 @@ public class ShulkerCharm implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		config = loadConfig();
+		AutoConfig.register(ShulkerCharmConfig.class, JanksonConfigSerializer::new);
+		config = AutoConfig.getConfigHolder(ShulkerCharmConfig.class).getConfig();
 		if (config.maxEnergy != -1) {
 			config.maxPower = config.maxEnergy;
 			config.maxEnergy = -1;
-			saveConfig(config);
 		}
-		TrinketSlots.addSlot(SlotGroups.CHEST, Slots.NECKLACE, new Identifier("trinkets", "textures/item/empty_trinket_slot_necklace.png"));
-	}
-
-	public ShulkerCharmConfig loadConfig() {
-		try {
-			Jankson jankson = JanksonFactory.createJankson();
-			File file = FabricLoader.getInstance().getConfigDir().resolve("shulkercharm.json5").toFile();
-			if (!file.exists()) saveConfig(new ShulkerCharmConfig());
-			JsonObject json = jankson.load(file);
-			ShulkerCharmConfig result =  jankson.fromJson(json, ShulkerCharmConfig.class);
-			JsonElement jsonElementNew = jankson.toJson(new ShulkerCharmConfig());
-			if(jsonElementNew instanceof JsonObject){
-				JsonObject jsonNew = (JsonObject) jsonElementNew;
-				if(json.getDelta(jsonNew).size() > 0){
-					saveConfig(result);
-				}
-			}
-			return result;
-		} catch (Exception e) {
-			logger.error("[ShulkerCharm] Error loading config: {}", e.getMessage());
-		}
-		return new ShulkerCharmConfig();
-	}
-
-	public void saveConfig(ShulkerCharmConfig config) {
-		try {
-			File file = FabricLoader.getInstance().getConfigDirectory().toPath().resolve("shulkercharm.json5").toFile();
-			JsonElement json = JanksonFactory.createJankson().toJson(config);
-			String result = json.toJson(true, true);
-			if (!file.exists()) file.createNewFile();
-			FileOutputStream out = new FileOutputStream(file,false);
-			out.write(result.getBytes());
-			out.flush();
-			out.close();
-		} catch (Exception e) {
-			logger.error("[ShulkerCharm] Error saving config: {}", e.getMessage());
-		}
+		//trinkets now adds slots via data tags
+		//TrinketSlots.addSlot(SlotGroups.CHEST, Slots.NECKLACE, new Identifier("trinkets", "textures/item/empty_trinket_slot_necklace.png"));
 	}
 }
