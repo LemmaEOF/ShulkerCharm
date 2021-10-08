@@ -24,7 +24,8 @@ public abstract class MixinItemRenderer {
 			CustomDurabilityItem durab = (CustomDurabilityItem)stack.getItem();
 			RenderSystem.disableDepthTest();
 			RenderSystem.disableTexture();
-			RenderSystem.disableAlphaTest();
+			//this no longer exists, dunno what its replacement should be
+			//RenderSystem.disableAlphaTest();
 			RenderSystem.disableBlend();
 
 			Tessellator tessellator = Tessellator.getInstance();
@@ -38,7 +39,8 @@ public abstract class MixinItemRenderer {
 			this.renderGuiQuad(builder, x + 2, y + 13, durability, 1, color >> 16 & 255, color >> 8 & 255, color & 255, 255);
 
 			RenderSystem.enableBlend();
-			RenderSystem.enableAlphaTest();
+			//this no longer exists, dunno what its replacement should be
+			//RenderSystem.enableAlphaTest();
 			RenderSystem.enableTexture();
 			RenderSystem.enableDepthTest();
 		}

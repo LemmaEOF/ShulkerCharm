@@ -1,0 +1,6 @@
+{
+  "replace": false,
+  "values": [
+    {"id": "shulkercharm:shulker_charm", "required": false }
+  ]
+}

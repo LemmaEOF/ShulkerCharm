@@ -1,0 +1,12 @@
+{
+  "icon": "shulkercharm:item/empty_trinket_slot_necklace",
+  "drop_rule": "default",
+  "validator_predicates": [
+  ],
+  "quick_move_predicates": [
+    "trinkets:relevant"
+  ],
+  "tooltip_predicates": [
+    "trinkets:relevant"
+  ]
+}
