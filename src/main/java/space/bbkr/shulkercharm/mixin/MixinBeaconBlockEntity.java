@@ -33,8 +33,6 @@ public abstract class MixinBeaconBlockEntity extends BlockEntity {
 
 	@Shadow int level;
 
-	@Shadow @Final private PropertyDelegate propertyDelegate;
-
 	public MixinBeaconBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 	}
