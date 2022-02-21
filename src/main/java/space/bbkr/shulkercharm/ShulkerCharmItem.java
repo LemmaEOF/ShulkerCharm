@@ -1,9 +1,9 @@
 package space.bbkr.shulkercharm;
 
+import blue.endless.jankson.annotation.Nullable;
 import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.TrinketItem;
 import io.github.ladysnake.pal.VanillaAbilities;
-import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.annotation.Nullable;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
@@ -12,23 +12,21 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.world.World;
-import space.bbkr.shulkercharm.hooks.CustomDurabilityItem;
 
 import java.util.List;
 
-public class ShulkerCharmItem extends TrinketItem implements CustomDurabilityItem {
+public class ShulkerCharmItem extends TrinketItem {
 	public ShulkerCharmItem(Settings settings) {
 		super(settings);
 	}
 
 	@Override
 	public void tick(ItemStack stack, SlotReference slot, LivingEntity entity) {
-		if(entity.isPlayer()) {
-			PlayerEntity player = (PlayerEntity) entity;
+		super.tick(stack, slot, entity);
+		if (entity instanceof PlayerEntity player) {
 			int power = getPower(stack);
 			if (player.world.isClient) return;
 			if (ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
@@ -52,8 +50,8 @@ public class ShulkerCharmItem extends TrinketItem implements CustomDurabilityIte
 
 	@Override
 	public void onUnequip(ItemStack stack, SlotReference slot, LivingEntity entity) {
-		if(entity.isPlayer()) {
-			PlayerEntity player = (PlayerEntity) entity;
+		super.onUnequip(stack, slot, entity);
+		if (entity instanceof PlayerEntity player) {
 			if (!player.world.isClient && ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
 				ShulkerCharm.CHARM_FLIGHT.revokeFrom(player, VanillaAbilities.ALLOW_FLYING);
 				if (!VanillaAbilities.ALLOW_FLYING.isEnabledFor(player)) {
@@ -65,31 +63,20 @@ public class ShulkerCharmItem extends TrinketItem implements CustomDurabilityIte
 	}
 
 	@Override
-	public boolean shouldShowDurability(ItemStack stack) {
-		if (ShulkerCharm.config.rangeModifier == -1) {
-			return false;
-		}
+	public boolean isItemBarVisible(ItemStack stack) {
+		if (ShulkerCharm.config.rangeModifier == -1) return false;
 		NbtCompound tag = stack.getOrCreateNbt();
-		if (tag.contains("Power", NbtType.INT)) {
-			return tag.getInt("Power") != getMaxDurability(stack);
-		}
-		else {
-			return true;
-		}
+		if (tag.contains("Power", NbtType.INT)) return tag.getInt("Power") != ShulkerCharm.config.maxPower;
+		else return true;
 	}
 
 	@Override
-	public int getMaxDurability(ItemStack stack) {
-		return ShulkerCharm.config.maxPower;
+	public int getItemBarStep(ItemStack stack) {
+		return Math.round(((float)getPower(stack) / (float)ShulkerCharm.config.maxPower) * 13.0F);
 	}
 
 	@Override
-	public int getDurability(ItemStack stack) {
-		return getPower(stack);
-	}
-
-	@Override
-	public int getDurabilityColor(ItemStack stack) {
+	public int getItemBarColor(ItemStack stack) {
 		return 0xC7C38D;
 	}
 
@@ -120,7 +107,7 @@ public class ShulkerCharmItem extends TrinketItem implements CustomDurabilityIte
 	 */
 	public void setPower(ItemStack stack, int power) {
 		NbtCompound tag = stack.getOrCreateNbt();
-		tag.putInt("Power", Math.max(0, Math.min(power, getMaxDurability(stack))));
+		tag.putInt("Power", Math.max(0, Math.min(power, ShulkerCharm.config.maxPower)));
 	}
 
 	/**

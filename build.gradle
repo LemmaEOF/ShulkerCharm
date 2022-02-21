@@ -1,6 +1,7 @@
 plugins {
-	id 'fabric-loom' version '0.9-SNAPSHOT'
-	id 'maven-publish'
+	id "fabric-loom" version "0.10-SNAPSHOT"
+	id "maven-publish"
+	id "com.jfrog.artifactory" version "4.15.2"
 }
 
 sourceCompatibility = JavaVersion.VERSION_16
@@ -10,40 +11,50 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
-dependencies {
-	//to change the versions see the gradle.properties file
-	//minecraft version
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	//yarn mappings
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	//fabric loader
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-	//fabric api
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	//trinkets, to equip trinkets
-	modImplementation "dev.emi:trinkets:${trinkets_version}"
-	//cardinal components api bcus trinkets???
-	modImplementation "dev.whomst:cardinal-components-base:${cardinal_components_version}"
-	modImplementation "dev.whomst:cardinal-components-entity:${cardinal_components_version}"
-	//player ability lib
-	modImplementation "io.github.ladysnake:PlayerAbilityLib:${project.pal_version}"
-	//config api
-	modApi("me.shedaniel.cloth:cloth-config:${cloth_config_version}-fabric") {
-		exclude(group: "net.fabricmc.fabric-api")
-	}
+if(rootProject.file('private.gradle').exists()) { //Publishing details
+	apply from: 'private.gradle'
 }
 
-processResources {
-	inputs.property "version", project.version
+archivesBaseName = "${project.archives_base_name}"
+group = "${project.maven_group}"
+version = "${project.mod_version}+${project.minecraft_version}"
 
-	from(sourceSets.main.resources.srcDirs) {
-		include "fabric.mod.json"
-		expand "version": project.version
-	}
+minecraft {
+}
 
-	from(sourceSets.main.resources.srcDirs) {
-		exclude "fabric.mod.json"
+repositories {
+	mavenCentral()
+	maven { url "https://maven.fabricmc.net/" }
+	maven { url "https://server.bbkr.space/artifactory/libs-release" }
+	maven { url "https://jitpack.io" }
+	maven {
+		name = 'Ladysnake Mods'
+		url = 'https://ladysnake.jfrog.io/artifactory/mods'
+		content {
+			includeGroup 'io.github.ladysnake'
+			includeGroupByRegex 'io\\.github\\.onyxstudios.*'
+		}
 	}
+	maven {
+		name = "TerraformersMC"
+		url = "https://maven.terraformersmc.com/"
+	}
+//	maven { url "https://maven.pkg.github.com" }
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.yarn_build}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	compileOnly "com.google.code.findbugs:jsr305:3.0.2"
+
+	modImplementation "com.github.emilyploszaj:trinkets:${project.trinkets_version}"
+	modImplementation "io.github.cottonmc:Jankson-Fabric:${project.jankson_version}"
+	modImplementation "io.github.ladysnake:PlayerAbilityLib:${project.pal_version}"
+	include "com.github.emilyploszaj:trinkets:${project.trinkets_version}"
+	include "io.github.ladysnake:PlayerAbilityLib:${project.pal_version}"
+	include "io.github.cottonmc:Jankson-Fabric:${project.jankson_version}"
 }
 
 // ensure that the encoding is set to UTF-8, no matter what the system default is
@@ -53,7 +64,6 @@ tasks.withType(JavaCompile) {
 	options.encoding = "UTF-8"
 }
 
-//fixes problem i had with intellij and gradle
 tasks {
 	processResources {
 		setDuplicatesStrategy('include')
@@ -70,20 +80,6 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 
 jar {
 	from "LICENSE"
-}
-
-repositories {
-	mavenCentral()
-	//reach entity attributes
-	maven {	url "https://maven.jamieswhiteshirt.com/libs-release"}
-	//mod menu
-	//maven {	url = "https://maven.terraformersmc.com/"}
-	//trinkets cardinal components
-	maven {
-		name = "LadysnakeLibs"
-		url = "https://ladysnake.jfrog.io/artifactory/mods"
-	}
-	maven { url "https://maven.shedaniel.me/" }
 }
 
 // configure the maven publication
