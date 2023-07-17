@@ -23,7 +23,7 @@ public abstract class MixinItemRenderer {
 		if (stack.getItem() instanceof CustomDurabilityItem) {
 			CustomDurabilityItem durab = (CustomDurabilityItem)stack.getItem();
 			RenderSystem.disableDepthTest();
-			RenderSystem.disableTexture();
+			//RenderSystem.disableTexture();
 			//this no longer exists, dunno what its replacement should be
 			//RenderSystem.disableAlphaTest();
 			RenderSystem.disableBlend();
@@ -41,7 +41,7 @@ public abstract class MixinItemRenderer {
 			RenderSystem.enableBlend();
 			//this no longer exists, dunno what its replacement should be
 			//RenderSystem.enableAlphaTest();
-			RenderSystem.enableTexture();
+			//RenderSystem.enableTexture();
 			RenderSystem.enableDepthTest();
 		}
 	}

@@ -1,14 +1,37 @@
 plugins {
-	id 'fabric-loom' version '0.9-SNAPSHOT'
+	id 'fabric-loom' version '1.3-SNAPSHOT'
 	id 'maven-publish'
 }
 
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
+
+repositories {
+	mavenCentral()
+	//Trinkets
+	maven {
+		name = "TerraformersMC"
+		url = "https://maven.terraformersmc.com/"
+	}
+	//Player Ability Lib
+	maven {
+		name = 'Ladysnake Mods'
+		url = 'https://maven.ladysnake.org/releases'
+		content {
+			includeGroup 'io.github.ladysnake'
+			includeGroupByRegex 'io\\.github\\.onyxstudios.*'
+		}
+	}
+	//Cloth Config API
+	maven { url "https://maven.shedaniel.me/" }
+	flatDir {
+		dirs 'build/loom-cache'
+	}
+}
 
 dependencies {
 	//to change the versions see the gradle.properties file
@@ -20,15 +43,16 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	//fabric api
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	//trinkets, to equip trinkets
+	//trinkets
 	modImplementation "dev.emi:trinkets:${trinkets_version}"
-	//cardinal components api bcus trinkets???
-	modImplementation "dev.whomst:cardinal-components-base:${cardinal_components_version}"
-	modImplementation "dev.whomst:cardinal-components-entity:${cardinal_components_version}"
+	//cardinal components api
+	modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cardinal_components_version}"
+	modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cardinal_components_version}"
 	//player ability lib
-	modImplementation "io.github.ladysnake:PlayerAbilityLib:${project.pal_version}"
+	modImplementation "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
+	include "io.github.ladysnake:PlayerAbilityLib:${pal_version}"
 	//config api
-	modApi("me.shedaniel.cloth:cloth-config:${cloth_config_version}-fabric") {
+	modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
 		exclude(group: "net.fabricmc.fabric-api")
 	}
 }
@@ -64,7 +88,7 @@ tasks {
 // if it is present.
 // If you remove this task, sources will not be generated.
 task sourcesJar(type: Jar, dependsOn: classes) {
-	classifier = "sources"
+	//classifier = "sources"
 	from sourceSets.main.allSource
 }
 
@@ -72,19 +96,6 @@ jar {
 	from "LICENSE"
 }
 
-repositories {
-	mavenCentral()
-	//reach entity attributes
-	maven {	url "https://maven.jamieswhiteshirt.com/libs-release"}
-	//mod menu
-	//maven {	url = "https://maven.terraformersmc.com/"}
-	//trinkets cardinal components
-	maven {
-		name = "LadysnakeLibs"
-		url = "https://ladysnake.jfrog.io/artifactory/mods"
-	}
-	maven { url "https://maven.shedaniel.me/" }
-}
 
 // configure the maven publication
 publishing {

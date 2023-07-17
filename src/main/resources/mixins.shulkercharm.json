@@ -6,6 +6,5 @@
     "MixinBeaconBlockEntity"
   ],
   "client": [
-    "MixinItemRenderer"
   ]
 }

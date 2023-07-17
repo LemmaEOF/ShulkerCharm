@@ -14,7 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.world.World;
 import space.bbkr.shulkercharm.hooks.CustomDurabilityItem;
 
@@ -30,7 +30,7 @@ public class ShulkerCharmItem extends TrinketItem implements CustomDurabilityIte
 		if(entity.isPlayer()) {
 			PlayerEntity player = (PlayerEntity) entity;
 			int power = getPower(stack);
-			if (player.world.isClient) return;
+			if (player.getWorld().isClient) return;
 			if (ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
 				if (power <= 0) {
 					ShulkerCharm.CHARM_FLIGHT.revokeFrom(player, VanillaAbilities.ALLOW_FLYING);
@@ -54,7 +54,7 @@ public class ShulkerCharmItem extends TrinketItem implements CustomDurabilityIte
 	public void onUnequip(ItemStack stack, SlotReference slot, LivingEntity entity) {
 		if(entity.isPlayer()) {
 			PlayerEntity player = (PlayerEntity) entity;
-			if (!player.world.isClient && ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
+			if (!player.getWorld().isClient && ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
 				ShulkerCharm.CHARM_FLIGHT.revokeFrom(player, VanillaAbilities.ALLOW_FLYING);
 				if (!VanillaAbilities.ALLOW_FLYING.isEnabledFor(player)) {
 					player.getAbilities().flying = false;
@@ -97,7 +97,7 @@ public class ShulkerCharmItem extends TrinketItem implements CustomDurabilityIte
 	public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
 		if (context.isAdvanced()) {
 			int power = getPower(stack);
-			tooltip.add(new TranslatableText("tooltip.shulkercharm.power", power, ShulkerCharm.config.maxPower));
+			tooltip.add(Text.translatable("tooltip.shulkercharm.power", power, ShulkerCharm.config.maxPower));
 		}
 	}
 
