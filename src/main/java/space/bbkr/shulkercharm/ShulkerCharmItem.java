@@ -1,9 +1,9 @@
 package space.bbkr.shulkercharm;
 
+import blue.endless.jankson.annotation.Nullable;
 import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.TrinketItem;
 import io.github.ladysnake.pal.VanillaAbilities;
-import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.annotation.Nullable;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
@@ -12,7 +12,6 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.math.MathHelper;
@@ -27,8 +26,8 @@ public class ShulkerCharmItem extends TrinketItem {
 
 	@Override
 	public void tick(ItemStack stack, SlotReference slot, LivingEntity entity) {
-		if(entity.isPlayer()) {
-			PlayerEntity player = (PlayerEntity) entity;
+		super.tick(stack, slot, entity);
+		if (entity instanceof PlayerEntity player) {
 			int power = getPower(stack);
 			if (player.getWorld().isClient) return;
 			if (ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
@@ -52,9 +51,9 @@ public class ShulkerCharmItem extends TrinketItem {
 
 	@Override
 	public void onUnequip(ItemStack stack, SlotReference slot, LivingEntity entity) {
-		if(entity.isPlayer()) {
-			PlayerEntity player = (PlayerEntity) entity;
-			if (!player.getWorld().isClient && ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
+		super.onUnequip(stack, slot, entity);
+		if (entity instanceof PlayerEntity player) {
+			if (!player.world.isClient && ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
 				ShulkerCharm.CHARM_FLIGHT.revokeFrom(player, VanillaAbilities.ALLOW_FLYING);
 				if (!VanillaAbilities.ALLOW_FLYING.isEnabledFor(player)) {
 					player.getAbilities().flying = false;

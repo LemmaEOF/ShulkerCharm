@@ -2,8 +2,6 @@ package space.bbkr.shulkercharm;
 
 import io.github.ladysnake.pal.AbilitySource;
 import io.github.ladysnake.pal.Pal;
-import me.shedaniel.autoconfig.AutoConfig;
-import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.Item;
@@ -38,4 +36,5 @@ public class ShulkerCharm implements ModInitializer {
 			config.maxEnergy = -1;
 		}
 	}
+
 }

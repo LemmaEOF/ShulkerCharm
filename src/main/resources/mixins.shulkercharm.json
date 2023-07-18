@@ -1,7 +1,6 @@
 {
   "required": true,
   "package": "space.bbkr.shulkercharm.mixin",
-  "compatibilityLevel": "JAVA_8",
   "mixins": [
     "MixinBeaconBlockEntity"
   ],
