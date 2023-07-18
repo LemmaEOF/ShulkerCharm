@@ -3,5 +3,7 @@
   "package": "space.bbkr.shulkercharm.mixin",
   "mixins": [
     "MixinBeaconBlockEntity"
+  ],
+  "client": [
   ]
 }

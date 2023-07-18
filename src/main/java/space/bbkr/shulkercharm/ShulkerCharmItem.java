@@ -13,7 +13,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.TranslatableTextContent;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public class ShulkerCharmItem extends TrinketItem {
 		super.tick(stack, slot, entity);
 		if (entity instanceof PlayerEntity player) {
 			int power = getPower(stack);
-			if (player.world.isClient) return;
+			if (player.getWorld().isClient) return;
 			if (ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
 				if (power <= 0) {
 					ShulkerCharm.CHARM_FLIGHT.revokeFrom(player, VanillaAbilities.ALLOW_FLYING);
@@ -64,15 +65,16 @@ public class ShulkerCharmItem extends TrinketItem {
 
 	@Override
 	public boolean isItemBarVisible(ItemStack stack) {
-		if (ShulkerCharm.config.rangeModifier == -1) return false;
-		NbtCompound tag = stack.getOrCreateNbt();
-		if (tag.contains("Power", NbtType.INT)) return tag.getInt("Power") != ShulkerCharm.config.maxPower;
-		else return true;
+		if (ShulkerCharm.config.rangeModifier == -1) {
+			return false;
+		}
+		//"-1" so that the bar doesnt show while flying at 'max charge' in range of a beacon
+		return getPower(stack) < getMaxDurability() - 1;
 	}
 
 	@Override
 	public int getItemBarStep(ItemStack stack) {
-		return Math.round(((float)getPower(stack) / (float)ShulkerCharm.config.maxPower) * 13.0F);
+		return Math.round((float)getPower(stack) * 13.0F / (float)getMaxDurability());
 	}
 
 	@Override
@@ -80,11 +82,15 @@ public class ShulkerCharmItem extends TrinketItem {
 		return 0xC7C38D;
 	}
 
+	public int getMaxDurability() {
+		return ShulkerCharm.config.maxPower;
+	}
+
 	@Override
 	public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
 		if (context.isAdvanced()) {
 			int power = getPower(stack);
-			tooltip.add(new TranslatableText("tooltip.shulkercharm.power", power, ShulkerCharm.config.maxPower));
+			tooltip.add(Text.translatable("tooltip.shulkercharm.power", power, getMaxDurability()));
 		}
 	}
 
@@ -94,7 +100,7 @@ public class ShulkerCharmItem extends TrinketItem {
 	 * @return The amount of power it currently has.
 	 */
 	public int getPower(ItemStack stack) {
-		if (ShulkerCharm.config.rangeModifier == -1) return ShulkerCharm.config.maxPower;
+		if (ShulkerCharm.config.rangeModifier == -1) return getMaxDurability();
 		NbtCompound tag = stack.getOrCreateNbt();
 		if (!tag.contains("Power", NbtType.INT)) tag.putInt("Power", 0);
 		return tag.getInt("Power");
@@ -107,7 +113,7 @@ public class ShulkerCharmItem extends TrinketItem {
 	 */
 	public void setPower(ItemStack stack, int power) {
 		NbtCompound tag = stack.getOrCreateNbt();
-		tag.putInt("Power", Math.max(0, Math.min(power, ShulkerCharm.config.maxPower)));
+		tag.putInt("Power", Math.max(0, Math.min(power, getMaxDurability())));
 	}
 
 	/**
