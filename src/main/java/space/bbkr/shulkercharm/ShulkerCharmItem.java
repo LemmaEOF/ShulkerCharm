@@ -51,7 +51,6 @@ public class ShulkerCharmItem extends TrinketItem {
 
 	@Override
 	public void onUnequip(ItemStack stack, SlotReference slot, LivingEntity entity) {
-		System.out.println("onUnequiped called");
 		super.onUnequip(stack, slot, entity);
 		if (entity instanceof PlayerEntity player) {
 			if (!player.getWorld().isClient
@@ -59,7 +58,6 @@ public class ShulkerCharmItem extends TrinketItem {
 					&& !slot.inventory().getStack(0).isOf(ShulkerCharm.SHULKER_CHARM)) {
 				ShulkerCharm.CHARM_FLIGHT.revokeFrom(player, VanillaAbilities.ALLOW_FLYING);
 				if (!VanillaAbilities.ALLOW_FLYING.isEnabledFor(player)) {
-					System.out.println("Shulker Charm Unequipped");
 					player.getAbilities().flying = false;
 					player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 100));
 				}
