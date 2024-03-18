@@ -1,9 +1,9 @@
 package space.bbkr.shulkercharm;
 
-import blue.endless.jankson.annotation.Nullable;
 import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.TrinketItem;
 import io.github.ladysnake.pal.VanillaAbilities;
+import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.annotation.Nullable;
 import net.fabricmc.fabric.api.util.NbtType;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
@@ -51,11 +51,15 @@ public class ShulkerCharmItem extends TrinketItem {
 
 	@Override
 	public void onUnequip(ItemStack stack, SlotReference slot, LivingEntity entity) {
+		System.out.println("onUnequiped called");
 		super.onUnequip(stack, slot, entity);
 		if (entity instanceof PlayerEntity player) {
-			if (!player.world.isClient && ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)) {
+			if (!player.getWorld().isClient
+					&& ShulkerCharm.CHARM_FLIGHT.grants(player, VanillaAbilities.ALLOW_FLYING)
+					&& !slot.inventory().getStack(0).isOf(ShulkerCharm.SHULKER_CHARM)) {
 				ShulkerCharm.CHARM_FLIGHT.revokeFrom(player, VanillaAbilities.ALLOW_FLYING);
 				if (!VanillaAbilities.ALLOW_FLYING.isEnabledFor(player)) {
+					System.out.println("Shulker Charm Unequipped");
 					player.getAbilities().flying = false;
 					player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 100));
 				}
