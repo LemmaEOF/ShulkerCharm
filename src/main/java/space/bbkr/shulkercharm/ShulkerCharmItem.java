@@ -3,19 +3,17 @@ package space.bbkr.shulkercharm;
 import dev.emi.trinkets.api.SlotReference;
 import dev.emi.trinkets.api.TrinketItem;
 import io.github.ladysnake.pal.VanillaAbilities;
-import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.annotation.Nullable;
-import net.fabricmc.fabric.api.util.NbtType;
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -89,10 +87,9 @@ public class ShulkerCharmItem extends TrinketItem {
 	}
 
 	@Override
-	public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-		if (context.isAdvanced()) {
-			int power = getPower(stack);
-			tooltip.add(Text.translatable("tooltip.shulkercharm.power", power, getMaxDurability()));
+	public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+		if (type.isAdvanced()) {
+			tooltip.add(Text.translatable("tooltip.shulkercharm.power", getPower(stack), getMaxDurability()));
 		}
 	}
 
@@ -103,9 +100,7 @@ public class ShulkerCharmItem extends TrinketItem {
 	 */
 	public int getPower(ItemStack stack) {
 		if (ShulkerCharm.config.rangeModifier == -1) return getMaxDurability();
-		NbtCompound tag = stack.getOrCreateNbt();
-		if (!tag.contains("Power", NbtType.INT)) tag.putInt("Power", 0);
-		return tag.getInt("Power");
+		return stack.getComponents().getOrDefault(ShulkerCharm.SHULKER_CHARM_CHARGE, 0);
 	}
 
 	/**
@@ -114,8 +109,11 @@ public class ShulkerCharmItem extends TrinketItem {
 	 * @param power The amount of power it should have.
 	 */
 	public void setPower(ItemStack stack, int power) {
-		NbtCompound tag = stack.getOrCreateNbt();
-		tag.putInt("Power", Math.max(0, Math.min(power, getMaxDurability())));
+		if(power >= getMaxDurability()) {
+			stack.set(ShulkerCharm.SHULKER_CHARM_CHARGE, getMaxDurability());
+		} else {
+			stack.set(ShulkerCharm.SHULKER_CHARM_CHARGE, power);
+		}
 	}
 
 	/**

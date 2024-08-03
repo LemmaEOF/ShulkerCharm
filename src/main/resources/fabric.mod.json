@@ -20,11 +20,11 @@
     "mixins.shulkercharm.json"
   ],
   "depends": {
-    "fabricloader": ">=0.14.21",
+    "fabricloader": ">=0.15.11",
     "fabric": "*",
-    "minecraft": ">=1.20.2",
-    "trinkets": ">=3.8.0",
-    "cloth-config2": ">=12.0.111",
-    "playerabilitylib": ">=1.9.0"
+    "minecraft": "1.21.x",
+    "trinkets": ">=3.10.0",
+    "cloth-config2": ">=15.0.128",
+    "playerabilitylib": ">=1.10.0"
   }
 }
